@@ -5,7 +5,6 @@
 OpenClaw的MCSManager插件，
 用于在对话中优雅的管理Minecraft服务器或其他由MCSManager托管的实例
 
----
 
 [![npm version](https://img.shields.io/npm/v/openclaw-mcsmanager-plugin?style=flat-square&logo=npm&label=npm)](https://www.npmjs.com/package/openclaw-mcsmanager-plugin)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://github.com/swxswxer/openclaw-mcsmanager-plugin/blob/main/LICENSE)
