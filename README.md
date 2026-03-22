@@ -1,6 +1,6 @@
 <div align="center">
 
-# openclaw-mcsmanager-plugin
+# OpenClaw-MCSManager-Plugin
 
 OpenClaw的MCSManager插件，
 用于在对话中优雅的管理Minecraft服务器或其他由MCSManager托管的实例
