@@ -1,6 +1,6 @@
 {
   "name": "openclaw-mcsmanager-plugin",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "OpenClaw 的 MCSManager 插件，让你在openclaw中更优雅的管理MCSManager的Minecraft服务器或其他游戏服务器",
   "repository": {
     "type": "git",

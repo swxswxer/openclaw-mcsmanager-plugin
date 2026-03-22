@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 
 const PACKAGE_NAME = "openclaw-mcsmanager-plugin";
 const OPENCLAW_CONFIG_PATH = path.join(homedir(), ".openclaw", "openclaw.json");
+const SAFE_WORKDIR = homedir();
 const OPENCLAW_EXTENSIONS_PATH = path.join(homedir(), ".openclaw", "extensions");
 const PLUGIN_INSTALL_PATH = path.join(OPENCLAW_EXTENSIONS_PATH, PACKAGE_NAME);
 const PLUGIN_ENV_PATH = path.join(PLUGIN_INSTALL_PATH, ".env");
@@ -14,6 +15,8 @@ const PLUGIN_ENV_PATH = path.join(PLUGIN_INSTALL_PATH, ".env");
 main();
 
 function main() {
+  ensureSafeWorkingDirectory();
+
   const command = process.argv[2];
 
   switch (command) {
@@ -108,7 +111,8 @@ function runOpenClaw(args, options = {}) {
       };
 
   const result = spawnSync("openclaw", args, {
-    ...spawnOptions
+    ...spawnOptions,
+    cwd: SAFE_WORKDIR
   });
 
   if (result.error) {
@@ -135,7 +139,8 @@ function restartGateway() {
 function setNpmRegistry() {
   const result = spawnSync("npm", ["config", "set", "registry", "https://registry.npmjs.org/"], {
     stdio: "pipe",
-    encoding: "utf8"
+    encoding: "utf8",
+    cwd: SAFE_WORKDIR
   });
 
   if (result.error) {
@@ -263,6 +268,20 @@ function readOpenClawConfig() {
 
   const raw = fs.readFileSync(OPENCLAW_CONFIG_PATH, "utf8");
   return JSON.parse(raw);
+}
+
+function ensureSafeWorkingDirectory() {
+  try {
+    process.cwd();
+  } catch {
+    process.chdir(SAFE_WORKDIR);
+    return;
+  }
+
+  const currentDir = process.cwd();
+  if (currentDir === PLUGIN_INSTALL_PATH || currentDir.startsWith(`${PLUGIN_INSTALL_PATH}${path.sep}`)) {
+    process.chdir(SAFE_WORKDIR);
+  }
 }
 
 function writeOpenClawConfig(config) {
