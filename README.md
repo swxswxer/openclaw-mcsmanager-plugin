@@ -1,19 +1,166 @@
-# OpenClaw MCSManager 插件
+# openclaw-mcsmanager-plugin
 
-这是一个给 OpenClaw 使用的 MCSManager 插件，当前先实现了最核心的一组能力：
+一个面向 OpenClaw 的 MCSManager 插件，用于在对话中管理 Minecraft 服务器或其他由 MCSManager 托管的实例。
 
-- 获取仪表盘概览数据
-- 提取节点 `daemonId`
-- 获取实例列表
-- 获取实例详情
-- 启动实例
-- 停止实例
-- 重启实例
-- 向实例发送命令
+当前版本聚焦于最常用的实例管理能力：查看仪表盘概览、获取节点 `daemonId`、查询实例、查看实例详情、启动/停止/重启实例，以及向实例发送控制台命令。
 
-项目结构保留了扩展空间，后续可以继续接入文件管理、镜像管理、用户管理等剩余接口。
+## 特性
 
-## 目录结构
+- 支持读取 MCSManager 仪表盘概览与节点信息
+- 支持查询实例列表和实例详情
+- 支持启动、停止、重启实例
+- 支持向实例发送控制台命令
+- 支持插件配置、插件目录 `.env`、系统环境变量三种配置来源
+- Skill 已按模块拆分，便于后续扩展文件管理、节点管理、镜像管理等功能
+
+## 已实现能力
+
+### 仪表盘管理
+
+- `mcsmanager_overview`
+  获取面板概览，并提取节点 `daemonId`
+
+### 实例管理
+
+- `mcsmanager_instance_list`
+  根据 `daemonId` 获取实例列表
+- `mcsmanager_instance_detail`
+  获取单个实例详情
+- `mcsmanager_instance_start`
+  启动实例
+- `mcsmanager_instance_stop`
+  停止实例
+- `mcsmanager_instance_restart`
+  重启实例
+- `mcsmanager_instance_command`
+  向实例发送控制台命令
+
+## Skills
+
+项目将 agent 使用说明拆分为两个模块化 skill：
+
+- [mcsmanager-dashboard/SKILL.md](/Users/swxswx/Desktop/code/codex/getMd/openclaw-mcsmanager-plugin/skills/mcsmanager-dashboard/SKILL.md)
+- [mcsmanager-instance/SKILL.md](/Users/swxswx/Desktop/code/codex/getMd/openclaw-mcsmanager-plugin/skills/mcsmanager-instance/SKILL.md)
+
+建议：
+
+- 涉及面板概览、节点、`daemonId` 获取时，优先阅读 `mcsmanager-dashboard`
+- 涉及实例状态、启停重启、发送命令时，优先阅读 `mcsmanager-instance`
+
+## 安装
+
+### 方式一：从本地路径安装
+
+适合开发或自托管部署：
+
+```bash
+cd /path/to/openclaw-mcsmanager-plugin
+npm install
+npm run build
+openclaw plugins install /path/to/openclaw-mcsmanager-plugin
+openclaw gateway restart
+```
+
+### 方式二：通过 npx 安装
+
+```bash
+npx -y openclaw-mcsmanager-plugin install
+```
+
+该命令会：
+
+1. 清理当前用户 `.openclaw` 中这个插件的陈旧配置键
+2. 从 npm 安装插件
+3. 自动重启 OpenClaw Gateway
+
+### 方式三：更新已安装插件
+
+如果你已经安装过旧版本，推荐先卸载再安装：
+
+```bash
+openclaw --yes plugins uninstall openclaw-mcsmanager-plugin
+openclaw plugins install /path/to/openclaw-mcsmanager-plugin
+openclaw gateway restart
+```
+
+也可以直接使用：
+
+```bash
+npx -y openclaw-mcsmanager-plugin update
+```
+
+该命令会：
+
+1. 备份并保留原有插件配置
+2. 卸载旧插件
+3. 删除旧扩展目录
+4. 从 npm 重新安装插件
+5. 恢复原有插件配置
+6. 自动重启 OpenClaw Gateway
+
+## 配置
+
+插件不会在单次工具调用时手动接收 `baseUrl` / `apiKey`。  
+必须先提供默认配置，相关工具才会注册。
+
+配置优先级如下：
+
+1. `plugins.entries.openclaw-mcsmanager-plugin.config`
+2. 插件根目录 `.env`
+3. 系统环境变量 `MCSMANAGER_BASE_URL` / `MCSMANAGER_API_KEY`
+
+### OpenClaw 配置示例
+
+```json
+{
+  "plugins": {
+    "entries": {
+      "openclaw-mcsmanager-plugin": {
+        "enabled": true,
+        "config": {
+          "baseUrl": "http://127.0.0.1:23333",
+          "apiKey": "your-api-key",
+          "timeoutMs": 15000
+        }
+      }
+    }
+  }
+}
+```
+
+### `.env` 示例
+
+将 `.env` 放在插件安装目录，例如：
+
+`~/.openclaw/extensions/openclaw-mcsmanager-plugin/.env`
+
+内容如下：
+
+```env
+MCSMANAGER_BASE_URL=http://127.0.0.1:23333
+MCSMANAGER_API_KEY=your_api_key
+MCSMANAGER_TIMEOUT_MS=15000
+```
+
+### 环境变量示例
+
+```bash
+export MCSMANAGER_BASE_URL="http://127.0.0.1:23333"
+export MCSMANAGER_API_KEY="your_api_key"
+export MCSMANAGER_TIMEOUT_MS="15000"
+```
+
+## 工作原理
+
+插件内部会统一处理 MCSManager 的鉴权与请求细节：
+
+- `apikey` 通过 URL Query 传递
+- 自动添加 `X-Requested-With: XMLHttpRequest`
+- 自动添加 `Content-Type: application/json; charset=utf-8`
+
+如果默认配置缺失，插件会进入待机状态，不注册工具，并在日志中提示需要补齐配置。
+
+## 项目结构
 
 ```text
 openclaw-mcsmanager-plugin/
@@ -37,129 +184,63 @@ openclaw-mcsmanager-plugin/
 └── tsconfig.json
 ```
 
-## 已实现工具
+## 开发
 
-更偏向 agent 的工具调用说明请看：
-
-- [mcsmanager-dashboard/SKILL.md](/Users/swxswx/Desktop/code/codex/getMd/openclaw-mcsmanager-plugin/skills/mcsmanager-dashboard/SKILL.md)
-- [mcsmanager-instance/SKILL.md](/Users/swxswx/Desktop/code/codex/getMd/openclaw-mcsmanager-plugin/skills/mcsmanager-instance/SKILL.md)
-
-其中：
-
-- 仪表盘、节点概览、`daemonId` 获取，归 `mcsmanager-dashboard`
-- 实例列表、实例详情、启动、停止、重启，归 `mcsmanager-instance`
-- 实例列表、实例详情、启动、停止、重启、发送命令，归 `mcsmanager-instance`
-
-### 1. `mcsmanager_overview`
-
-获取面板概览数据，并整理出节点 `daemonId` 列表。
-
-### 2. `mcsmanager_instance_list`
-
-根据 `daemonId` 获取实例列表，支持分页和实例名过滤。
-
-### 3. `mcsmanager_instance_detail`
-
-根据 `daemonId + uuid` 获取实例详情。
-
-### 4. `mcsmanager_instance_start`
-
-启动实例。
-
-### 5. `mcsmanager_instance_stop`
-
-停止实例。
-
-### 6. `mcsmanager_instance_restart`
-
-重启实例。
-
-### 7. `mcsmanager_instance_command`
-
-向指定实例发送控制台命令。
-
-## 配置方式
-
-插件不再支持在每次工具调用时手动传入 `baseUrl` / `apiKey`。
-
-你需要提前通过下面任一方式提供默认配置。
-
-### 方式一：使用 OpenClaw 插件配置
-
-```json
-{
-      "plugins": {
-        "entries": {
-      "openclaw-mcsmanager-plugin": {
-        "enabled": true,
-        "config": {
-          "baseUrl": "http://127.0.0.1:23333",
-          "apiKey": "你的 API Key",
-          "timeoutMs": 15000
-        }
-      }
-    }
-  }
-}
-```
-
-### 方式二：使用插件目录下的 `.env`
-
-插件会默认读取插件根目录下的 `.env` 文件。
-
-示例：
-
-```env
-MCSMANAGER_BASE_URL=http://127.0.0.1:23333
-MCSMANAGER_API_KEY=你的_API_Key
-MCSMANAGER_TIMEOUT_MS=15000
-```
-
-例如插件目录是：
-
-```text
-~/.openclaw/extensions/openclaw-mcsmanager-plugin/
-```
-
-那么就放在：
-
-```text
-~/.openclaw/extensions/openclaw-mcsmanager-plugin/.env
-```
-
-### 方式三：使用环境变量
+安装依赖：
 
 ```bash
-export MCSMANAGER_BASE_URL="http://127.0.0.1:23333"
-export MCSMANAGER_API_KEY="你的 API Key"
-export MCSMANAGER_TIMEOUT_MS="15000"
+npm install
 ```
 
-安装插件和启动 Gateway 时，OpenClaw 会基于插件元数据提示缺失的关键环境变量：
+类型检查：
 
-- `MCSMANAGER_BASE_URL`
-- `MCSMANAGER_API_KEY`
+```bash
+npm run check
+```
 
-其中主环境变量标记为：
+构建：
 
-- `MCSMANAGER_API_KEY`
+```bash
+npm run build
+```
 
-## 配置优先级
+## 发布
 
-插件按下面顺序取值：
+项目已包含基于 Git tag 的 npm 自动发布工作流：
 
-1. OpenClaw 插件配置 `plugins.entries.openclaw-mcsmanager-plugin.config`
-2. 插件目录下的 `.env`
-3. 进程环境变量
+- [publish.yml](/Users/swxswx/Desktop/code/codex/getMd/openclaw-mcsmanager-plugin/.github/workflows/publish.yml)
 
-如果 `baseUrl` 或 `apiKey` 缺失，插件会进入 `idle` 状态，不注册任何工具，并在 Gateway 日志里提示需要补齐配置。
+触发方式：
 
-## MCSManager 鉴权说明
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
 
-根据官方 API 文档：
+工作流会自动：
 
-- API Key 需要放在 URL Query 的 `apikey` 参数中
-- 需要带上请求头 `X-Requested-With: XMLHttpRequest`
-- 需要带上请求头 `Content-Type: application/json; charset=utf-8`
+1. 安装依赖
+2. 校验 `package.json.version` 与 tag 一致
+3. 执行构建
+4. 发布到 npm
 
-插件内部已经统一处理了这些细节。
+发布前需要在 npm 后台为当前 GitHub 仓库配置 Trusted Publishing。
+
+## 路线图
+
+- 文件管理
+- 节点管理
+- 镜像管理
+- 用户管理
+- 输出日志读取
+- 批量实例操作
+
+## 参考文档
+
+- [API接口-仪表盘管理.md](/Users/swxswx/Desktop/code/codex/getMd/md/API接口-仪表盘管理.md)
+- [API接口-实例管理.md](/Users/swxswx/Desktop/code/codex/getMd/md/API接口-实例管理.md)
+- [MCSManager Documentation](https://docs.mcsmanager.com/)
+
+## License
+
+MIT
