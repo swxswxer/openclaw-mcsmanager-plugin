@@ -1,67 +1,43 @@
+<div align="center">
+
 # openclaw-mcsmanager-plugin
 
-一个面向 OpenClaw 的 MCSManager 插件，用于在对话中管理 Minecraft 服务器或其他由 MCSManager 托管的实例。
+> 面向 OpenClaw 的 MCSManager 插件
 
-当前版本聚焦于最常用的实例管理能力：查看仪表盘概览、获取节点 `daemonId`、查询实例、查看实例详情、启动/停止/重启实例，以及向实例发送控制台命令。
+让 Agent 以更自然的方式接入 MCSManager，  
+完成实例查询、状态查看、启停重启、控制台命令下发等常用操作。  
+当前版本聚焦仪表盘管理与实例管理，并为后续扩展节点、文件、镜像等模块预留了清晰结构。
 
-## 特性
+---
 
-- 支持读取 MCSManager 仪表盘概览与节点信息
-- 支持查询实例列表和实例详情
-- 支持启动、停止、重启实例
-- 支持向实例发送控制台命令
-- 支持插件配置、插件目录 `.env`、系统环境变量三种配置来源
-- Skill 已按模块拆分，便于后续扩展文件管理、节点管理、镜像管理等功能
+[![npm version](https://img.shields.io/npm/v/openclaw-mcsmanager-plugin?style=flat-square&logo=npm&label=npm)](https://www.npmjs.com/package/openclaw-mcsmanager-plugin)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://github.com/swxswxer/openclaw-mcsmanager-plugin/blob/main/LICENSE)
+[![OpenClaw](https://img.shields.io/badge/OpenClaw-2026.3.13%2B-blue?style=flat-square)](https://openclaw.cc/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Plugin-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://github.com/swxswxer/openclaw-mcsmanager-plugin)
 
-## 已实现能力
+</div>
 
-### 仪表盘管理
+## 功能矩阵
 
-- `mcsmanager_overview`
-  获取面板概览，并提取节点 `daemonId`
-
-### 实例管理
-
-- `mcsmanager_instance_list`
-  根据 `daemonId` 获取实例列表
-- `mcsmanager_instance_detail`
-  获取单个实例详情
-- `mcsmanager_instance_start`
-  启动实例
-- `mcsmanager_instance_stop`
-  停止实例
-- `mcsmanager_instance_restart`
-  重启实例
-- `mcsmanager_instance_command`
-  向实例发送控制台命令
-
-## Skills
-
-项目将 agent 使用说明拆分为两个模块化 skill：
-
-- [mcsmanager-dashboard/SKILL.md](/Users/swxswx/Desktop/code/codex/getMd/openclaw-mcsmanager-plugin/skills/mcsmanager-dashboard/SKILL.md)
-- [mcsmanager-instance/SKILL.md](/Users/swxswx/Desktop/code/codex/getMd/openclaw-mcsmanager-plugin/skills/mcsmanager-instance/SKILL.md)
-
-建议：
-
-- 涉及面板概览、节点、`daemonId` 获取时，优先阅读 `mcsmanager-dashboard`
-- 涉及实例状态、启停重启、发送命令时，优先阅读 `mcsmanager-instance`
+| 模块 | 特性 | 工具名称 | 是否实现  |
+| --- | --- | --- |-------|
+| 仪表盘管理 | 获取面板概览与节点 `daemonId` | `mcsmanager_overview` | ✅     |
+| 实例管理 | 获取实例列表 | `mcsmanager_instance_list` | ✅     |
+| 实例管理 | 获取实例详情与运行状态 | `mcsmanager_instance_detail` | ✅     |
+| 实例管理 | 启动实例 | `mcsmanager_instance_start` | ✅     |
+| 实例管理 | 停止实例 | `mcsmanager_instance_stop` | ✅     |
+| 实例管理 | 重启实例 | `mcsmanager_instance_restart` | ✅     |
+| 实例管理 | 向实例发送控制台命令 | `mcsmanager_instance_command` | ✅     |
+| 节点管理 | 查询节点列表与节点详情 | `mcsmanager_node_list` / `mcsmanager_node_detail` | ❌     |
+| 文件管理 | 浏览、上传、下载、删除实例文件 | `mcsmanager_file_*` | ❌     |
+| 镜像管理 | 查询镜像列表与镜像详情 | `mcsmanager_image_*` | ❌     |
+| 用户管理 | 查询用户信息与权限 | `mcsmanager_user_*` | ❌     |
+| 实例管理 | 获取实例日志与控制台输出 | `mcsmanager_instance_logs` | ❌     |
+| 实例管理 | 创建、编辑、删除实例 | `mcsmanager_instance_create` / `mcsmanager_instance_update` / `mcsmanager_instance_delete` | ❌     |
+> **插件持续更新**：更多特性将在后续更新中实现
 
 ## 安装
-
-### 方式一：从本地路径安装
-
-适合开发或自托管部署：
-
-```bash
-cd /path/to/openclaw-mcsmanager-plugin
-npm install
-npm run build
-openclaw plugins install /path/to/openclaw-mcsmanager-plugin
-openclaw gateway restart
-```
-
-### 方式二：通过 npx 安装
+### 方式一：通过 npx 安装
 
 ```bash
 npx -y openclaw-mcsmanager-plugin install
@@ -73,6 +49,18 @@ npx -y openclaw-mcsmanager-plugin install
 2. 从 npm 安装插件
 3. 补回插件允许列表与启用状态
 4. 自动重启 OpenClaw Gateway
+
+### 方式二：从本地路径安装
+
+适合开发或自托管部署：
+
+```bash
+cd /path/to/openclaw-mcsmanager-plugin
+npm install
+npm run build
+openclaw plugins install /path/to/openclaw-mcsmanager-plugin
+openclaw gateway restart
+```
 
 ### 方式三：更新已安装插件
 
@@ -95,8 +83,7 @@ npx -y openclaw-mcsmanager-plugin update
 
 ## 配置
 
-插件不会在单次工具调用时手动接收 `baseUrl` / `apiKey`。  
-必须先提供默认配置，相关工具才会注册。
+需要先配置参数 `baseUrl` / `apiKey`，插件相关工具才会注册。
 
 配置优先级如下：
 
@@ -179,62 +166,11 @@ openclaw-mcsmanager-plugin/
 └── tsconfig.json
 ```
 
-## 开发
 
-安装依赖：
+## 致谢
 
-```bash
-npm install
-```
-
-类型检查：
-
-```bash
-npm run check
-```
-
-构建：
-
-```bash
-npm run build
-```
-
-## 发布
-
-项目已包含基于 Git tag 的 npm 自动发布工作流：
-
-- [publish.yml](/Users/swxswx/Desktop/code/codex/getMd/openclaw-mcsmanager-plugin/.github/workflows/publish.yml)
-
-触发方式：
-
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
-
-工作流会自动：
-
-1. 安装依赖
-2. 校验 `package.json.version` 与 tag 一致
-3. 执行构建
-4. 发布到 npm
-
-发布前需要在 npm 后台为当前 GitHub 仓库配置 Trusted Publishing。
-
-## 路线图
-
-- 文件管理
-- 节点管理
-- 镜像管理
-- 用户管理
-- 输出日志读取
-- 批量实例操作
-
-## 参考文档
-
-- [API接口-仪表盘管理.md](/Users/swxswx/Desktop/code/codex/getMd/md/API接口-仪表盘管理.md)
-- [API接口-实例管理.md](/Users/swxswx/Desktop/code/codex/getMd/md/API接口-实例管理.md)
-- [MCSManager Documentation](https://docs.mcsmanager.com/)
+- [MCSManager](https://github.com/MCSManager/MCSManager)
+- [OpenClaw](https://github.com/openclaw/openclaw)
 
 ## License
 
