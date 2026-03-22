@@ -71,19 +71,12 @@ npx -y openclaw-mcsmanager-plugin install
 
 1. 清理当前用户 `.openclaw` 中这个插件的陈旧配置键
 2. 从 npm 安装插件
-3. 自动重启 OpenClaw Gateway
+3. 补回插件允许列表与启用状态
+4. 自动重启 OpenClaw Gateway
 
 ### 方式三：更新已安装插件
 
-如果你已经安装过旧版本，推荐先卸载再安装：
-
-```bash
-openclaw --yes plugins uninstall openclaw-mcsmanager-plugin
-openclaw plugins install /path/to/openclaw-mcsmanager-plugin
-openclaw gateway restart
-```
-
-也可以直接使用：
+如果你已经安装过旧版本，可以直接使用：
 
 ```bash
 npx -y openclaw-mcsmanager-plugin update
@@ -91,12 +84,14 @@ npx -y openclaw-mcsmanager-plugin update
 
 该命令会：
 
-1. 备份并保留原有插件配置
-2. 卸载旧插件
+1. 清理 `plugins.allow`、`plugins.entries`、`plugins.installs` 中的旧记录
+2. 调用 `openclaw plugins uninstall openclaw-mcsmanager-plugin --force`
 3. 删除旧扩展目录
-4. 从 npm 重新安装插件
-5. 恢复原有插件配置
-6. 自动重启 OpenClaw Gateway
+4. 设置 npm 官方 registry
+5. 从 npm 重新安装插件
+6. 补回插件允许列表与启用状态
+7. 自动恢复插件目录内已有的 `.env`
+8. 自动重启 OpenClaw Gateway
 
 ## 配置
 

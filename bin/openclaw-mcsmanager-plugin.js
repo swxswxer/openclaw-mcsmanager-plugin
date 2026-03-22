@@ -9,6 +9,7 @@ const PACKAGE_NAME = "openclaw-mcsmanager-plugin";
 const OPENCLAW_CONFIG_PATH = path.join(homedir(), ".openclaw", "openclaw.json");
 const OPENCLAW_EXTENSIONS_PATH = path.join(homedir(), ".openclaw", "extensions");
 const PLUGIN_INSTALL_PATH = path.join(OPENCLAW_EXTENSIONS_PATH, PACKAGE_NAME);
+const PLUGIN_ENV_PATH = path.join(PLUGIN_INSTALL_PATH, ".env");
 
 main();
 
@@ -44,23 +45,28 @@ function install() {
 
   const snapshot = readPluginEntrySnapshot();
   removePluginKeysFromConfig();
+  setNpmRegistry();
   runOpenClaw(["plugins", "install", PACKAGE_NAME]);
-  restorePluginEntrySnapshot(snapshot);
+  finalizePluginConfig(snapshot);
   restartGateway();
 }
 
 function update() {
+  console.log(`Starting reinstall update for ${PACKAGE_NAME}...`);
+
   const snapshot = readPluginEntrySnapshot();
+  const envSnapshot = readPluginEnvSnapshot();
   removePluginKeysFromConfig();
 
-  runOpenClaw(["plugins", "uninstall", PACKAGE_NAME], {
-    input: "y\n",
+  runOpenClaw(["plugins", "uninstall", PACKAGE_NAME, "--force"], {
     allowFailure: true
   });
 
   removeInstallDirectory();
+  setNpmRegistry();
   runOpenClaw(["plugins", "install", PACKAGE_NAME]);
-  restorePluginEntrySnapshot(snapshot);
+  restorePluginEnvSnapshot(envSnapshot);
+  finalizePluginConfig(snapshot);
   restartGateway();
 }
 
@@ -72,7 +78,7 @@ Usage:
 
 Commands:
   install   Install the OpenClaw plugin from npm and restart gateway
-  update    Preserve plugin config, reinstall the plugin, and restart gateway
+  update    Reinstall the plugin from npm and restart gateway
 `);
 }
 
@@ -101,6 +107,22 @@ function restartGateway() {
   runOpenClaw(["gateway", "restart"]);
 }
 
+function setNpmRegistry() {
+  const result = spawnSync("npm", ["config", "set", "registry", "https://registry.npmjs.org/"], {
+    stdio: "inherit",
+    encoding: "utf8"
+  });
+
+  if (result.error) {
+    console.warn(`Failed to set npm registry: ${result.error.message}`);
+    return;
+  }
+
+  if (result.status !== 0) {
+    console.warn("Failed to set npm registry. Continuing with current npm registry.");
+  }
+}
+
 function removeInstallDirectory() {
   if (fs.existsSync(PLUGIN_INSTALL_PATH)) {
     fs.rmSync(PLUGIN_INSTALL_PATH, { recursive: true, force: true });
@@ -111,6 +133,14 @@ function readPluginEntrySnapshot() {
   const config = readOpenClawConfig();
   const entry = config?.plugins?.entries?.[PACKAGE_NAME];
   return entry ? JSON.parse(JSON.stringify(entry)) : null;
+}
+
+function readPluginEnvSnapshot() {
+  if (!fs.existsSync(PLUGIN_ENV_PATH)) {
+    return null;
+  }
+
+  return fs.readFileSync(PLUGIN_ENV_PATH, "utf8");
 }
 
 function removePluginKeysFromConfig() {
@@ -136,29 +166,41 @@ function removePluginKeysFromConfig() {
   writeOpenClawConfig(config);
 }
 
-function restorePluginEntrySnapshot(snapshot) {
-  if (!snapshot) {
-    return;
-  }
-
+function finalizePluginConfig(snapshot) {
   const config = readOpenClawConfig();
   if (!config) {
     return;
   }
 
   const plugins = ensureObject(config, "plugins");
-  const entries = ensureNestedObject(plugins, "entries");
-  const currentEntry =
-    entries[PACKAGE_NAME] && typeof entries[PACKAGE_NAME] === "object"
-      ? entries[PACKAGE_NAME]
-      : {};
+  const allow = Array.isArray(plugins.allow) ? plugins.allow : [];
 
-  entries[PACKAGE_NAME] = {
-    ...currentEntry,
-    ...snapshot
+  if (!allow.includes(PACKAGE_NAME)) {
+    allow.push(PACKAGE_NAME);
+  }
+  plugins.allow = allow;
+
+  const entries = ensureNestedObject(plugins, "entries");
+  const nextEntry = {
+    enabled: true
   };
 
+  if (snapshot?.config && typeof snapshot.config === "object") {
+    nextEntry.config = snapshot.config;
+  }
+
+  entries[PACKAGE_NAME] = nextEntry;
+
   writeOpenClawConfig(config);
+}
+
+function restorePluginEnvSnapshot(snapshot) {
+  if (!snapshot) {
+    return;
+  }
+
+  fs.mkdirSync(PLUGIN_INSTALL_PATH, { recursive: true });
+  fs.writeFileSync(PLUGIN_ENV_PATH, snapshot, "utf8");
 }
 
 function readOpenClawConfig() {
