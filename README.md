@@ -84,9 +84,9 @@ npx -y openclaw-mcsmanager-plugin update
 
 该命令会：
 
-1. 清理 `plugins.allow`、`plugins.entries`、`plugins.installs` 中的旧记录
+1. 先清理 `plugins.allow` 和 `plugins.entries` 中的旧记录
 2. 调用 `openclaw plugins uninstall openclaw-mcsmanager-plugin --force`
-3. 删除旧扩展目录
+3. 清理残留的 `plugins.installs` 记录和旧扩展目录
 4. 设置 npm 官方 registry
 5. 从 npm 重新安装插件
 6. 补回插件允许列表与启用状态

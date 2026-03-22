@@ -44,7 +44,7 @@ function install() {
   }
 
   const snapshot = readPluginEntrySnapshot();
-  removePluginKeysFromConfig();
+  removePluginConfigKeys();
   setNpmRegistry();
   runOpenClaw(["plugins", "install", PACKAGE_NAME]);
   finalizePluginConfig(snapshot);
@@ -56,12 +56,13 @@ function update() {
 
   const snapshot = readPluginEntrySnapshot();
   const envSnapshot = readPluginEnvSnapshot();
-  removePluginKeysFromConfig();
+  removePluginConfigKeys();
 
   runOpenClaw(["plugins", "uninstall", PACKAGE_NAME, "--force"], {
     allowFailure: true
   });
 
+  removePluginInstallRecord();
   removeInstallDirectory();
   setNpmRegistry();
   runOpenClaw(["plugins", "install", PACKAGE_NAME]);
@@ -143,7 +144,7 @@ function readPluginEnvSnapshot() {
   return fs.readFileSync(PLUGIN_ENV_PATH, "utf8");
 }
 
-function removePluginKeysFromConfig() {
+function removePluginConfigKeys() {
   const config = readOpenClawConfig();
   if (!config) {
     return;
@@ -158,6 +159,17 @@ function removePluginKeysFromConfig() {
   if (plugins.entries && typeof plugins.entries === "object") {
     delete plugins.entries[PACKAGE_NAME];
   }
+
+  writeOpenClawConfig(config);
+}
+
+function removePluginInstallRecord() {
+  const config = readOpenClawConfig();
+  if (!config) {
+    return;
+  }
+
+  const plugins = ensureObject(config, "plugins");
 
   if (plugins.installs && typeof plugins.installs === "object") {
     delete plugins.installs[PACKAGE_NAME];
