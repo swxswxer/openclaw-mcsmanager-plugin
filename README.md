@@ -16,20 +16,20 @@ OpenClaw的MCSManager插件，
 ## 功能矩阵
 
 | 模块 | 特性 | 工具名称 | 是否实现  |
-| --- | --- | --- |-------|
-| 仪表盘管理 | 获取面板概览与节点 `daemonId` | `mcsmanager_overview` | ✅     |
-| 实例管理 | 获取实例列表 | `mcsmanager_instance_list` | ✅     |
-| 实例管理 | 获取实例详情与运行状态 | `mcsmanager_instance_detail` | ✅     |
-| 实例管理 | 启动实例 | `mcsmanager_instance_start` | ✅     |
-| 实例管理 | 停止实例 | `mcsmanager_instance_stop` | ✅     |
-| 实例管理 | 重启实例 | `mcsmanager_instance_restart` | ✅     |
-| 实例管理 | 向实例发送控制台命令 | `mcsmanager_instance_command` | ✅     |
-| 节点管理 | 查询节点列表与节点详情 | `mcsmanager_node_list` / `mcsmanager_node_detail` | ❌     |
-| 文件管理 | 浏览、上传、下载、删除实例文件 | `mcsmanager_file_*` | ❌     |
-| 镜像管理 | 查询镜像列表与镜像详情 | `mcsmanager_image_*` | ❌     |
-| 用户管理 | 查询用户信息与权限 | `mcsmanager_user_*` | ❌     |
-| 实例管理 | 获取实例日志与控制台输出 | `mcsmanager_instance_logs` | ❌     |
-| 实例管理 | 创建、编辑、删除实例 | `mcsmanager_instance_create` / `mcsmanager_instance_update` / `mcsmanager_instance_delete` | ❌     |
+| --- | --- | --- |---|
+| 仪表盘管理 | 获取面板概览与节点 `daemonId` | `mcsmanager_overview` | ✅ |
+| 实例管理 | 获取实例列表 | `mcsmanager_instance_list` | ✅ |
+| 实例管理 | 获取实例详情与运行状态 | `mcsmanager_instance_detail` | ✅ |
+| 实例管理 | 启动实例 | `mcsmanager_instance_start` | ✅ |
+| 实例管理 | 停止实例 | `mcsmanager_instance_stop` | ✅ |
+| 实例管理 | 重启实例 | `mcsmanager_instance_restart` | ✅ |
+| 实例管理 | 向实例发送控制台命令 | `mcsmanager_instance_command` | ✅ |
+| 节点管理 | 查询节点列表与节点详情 | `mcsmanager_node_list` / `mcsmanager_node_detail` | ❌ |
+| 文件管理 | 浏览、上传、下载、删除实例文件 | `mcsmanager_file_*` | ❌ |
+| 镜像管理 | 查询镜像列表与镜像详情 | `mcsmanager_image_*` | ❌ |
+| 用户管理 | 查询用户信息与权限 | `mcsmanager_user_*` | ❌ |
+| 实例管理 | 获取实例日志与控制台输出 | `mcsmanager_instance_logs` | ❌ |
+| 实例管理 | 创建、编辑、删除实例 | `mcsmanager_instance_*` | ❌ |
 > **插件持续更新**：更多特性将在后续更新中实现
 
 ## 安装
