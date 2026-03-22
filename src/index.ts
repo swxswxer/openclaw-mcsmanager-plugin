@@ -11,6 +11,7 @@ import { createOverviewTool } from "./tools/overview.js";
 import { resolveDefaultConnectionConfig } from "./tools/shared.js";
 
 export default function register(api: OpenClawPluginApi) {
+  const logPrefix = "openclaw-mcsmanager-plugin";
   const defaults = resolveDefaultConnectionConfig(api);
   const missing: string[] = [];
 
@@ -24,22 +25,22 @@ export default function register(api: OpenClawPluginApi) {
 
   if (missing.length > 0) {
     api.logger.warn(
-      `mcsmanager: no default config found. Set ${missing.join(
+      `${logPrefix}: no default config found. Set ${missing.join(
         " and "
       )} env var${missing.length > 1 ? "s" : ""} or plugins.entries.openclaw-mcsmanager-plugin.config.{baseUrl,apiKey}. Plugin idle.`
     );
     api.registerService({
-      id: "mcsmanager-config-status",
+      id: "openclaw-mcsmanager-plugin-config-status",
       start: () =>
         api.logger.info(
-          "mcsmanager: waiting for baseUrl/apiKey from plugin config, plugin root .env, or process env."
+          `${logPrefix}: waiting for baseUrl/apiKey from plugin config, plugin root .env, or process env.`
         ),
       stop: () => {}
     });
     return;
   }
 
-  api.logger.info("mcsmanager: initialized with default connection config.");
+  api.logger.info(`${logPrefix}: initialized with default connection config.`);
 
   api.registerTool(createOverviewTool(api));
   api.registerTool(createInstanceListTool(api));
