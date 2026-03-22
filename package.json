@@ -10,6 +10,10 @@
   "bugs": {
     "url": "https://github.com/swxswxer/openclaw-mcsmanager-plugin/issues"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "bin": {
     "openclaw-mcsmanager-plugin": "./bin/openclaw-mcsmanager-plugin.js"
