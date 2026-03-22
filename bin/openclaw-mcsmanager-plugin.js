@@ -46,9 +46,14 @@ function install() {
   const snapshot = readPluginEntrySnapshot();
   removePluginConfigKeys();
   setNpmRegistry();
-  runOpenClaw(["plugins", "install", PACKAGE_NAME]);
+  console.log("正在安装新版本...");
+  runOpenClaw(["plugins", "install", PACKAGE_NAME], {
+    quiet: true
+  });
   finalizePluginConfig(snapshot);
+  console.log("正在重启 Gateway...");
   restartGateway();
+  console.log("安装完成");
 }
 
 function update() {
@@ -58,17 +63,24 @@ function update() {
   const envSnapshot = readPluginEnvSnapshot();
   removePluginConfigKeys();
 
+  console.log("正在卸载旧版本...");
   runOpenClaw(["plugins", "uninstall", PACKAGE_NAME, "--force"], {
-    allowFailure: true
+    allowFailure: true,
+    quiet: true
   });
 
   removePluginInstallRecord();
   removeInstallDirectory();
   setNpmRegistry();
-  runOpenClaw(["plugins", "install", PACKAGE_NAME]);
+  console.log("正在安装新版本...");
+  runOpenClaw(["plugins", "install", PACKAGE_NAME], {
+    quiet: true
+  });
   restorePluginEnvSnapshot(envSnapshot);
   finalizePluginConfig(snapshot);
+  console.log("正在重启 Gateway...");
   restartGateway();
+  console.log("更新完成");
 }
 
 function printHelp() {
@@ -84,10 +96,19 @@ Commands:
 }
 
 function runOpenClaw(args, options = {}) {
+  const spawnOptions = options.quiet
+    ? {
+        stdio: "pipe",
+        encoding: "utf8"
+      }
+    : {
+        stdio: "inherit",
+        input: options.input,
+        encoding: "utf8"
+      };
+
   const result = spawnSync("openclaw", args, {
-    stdio: "inherit",
-    input: options.input,
-    encoding: "utf8"
+    ...spawnOptions
   });
 
   if (result.error) {
@@ -100,6 +121,9 @@ function runOpenClaw(args, options = {}) {
   }
 
   if (result.status !== 0 && !options.allowFailure) {
+    if (options.quiet) {
+      printCapturedOutput(result);
+    }
     process.exit(result.status ?? 1);
   }
 }
@@ -110,7 +134,7 @@ function restartGateway() {
 
 function setNpmRegistry() {
   const result = spawnSync("npm", ["config", "set", "registry", "https://registry.npmjs.org/"], {
-    stdio: "inherit",
+    stdio: "pipe",
     encoding: "utf8"
   });
 
@@ -120,7 +144,24 @@ function setNpmRegistry() {
   }
 
   if (result.status !== 0) {
+    printCapturedOutput(result);
     console.warn("Failed to set npm registry. Continuing with current npm registry.");
+  }
+}
+
+function printCapturedOutput(result) {
+  if (typeof result.stdout === "string" && result.stdout.trim()) {
+    process.stdout.write(result.stdout);
+    if (!result.stdout.endsWith("\n")) {
+      process.stdout.write("\n");
+    }
+  }
+
+  if (typeof result.stderr === "string" && result.stderr.trim()) {
+    process.stderr.write(result.stderr);
+    if (!result.stderr.endsWith("\n")) {
+      process.stderr.write("\n");
+    }
   }
 }
 
