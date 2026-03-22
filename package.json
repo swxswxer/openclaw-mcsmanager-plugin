@@ -1,0 +1,45 @@
+{
+  "name": "openclaw-mcsmanager-plugin",
+  "version": "0.1.0",
+  "description": "OpenClaw 的 MCSManager 插件，提供概览与实例管理能力。",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "skills",
+    "tools",
+    "README.md",
+    "openclaw.plugin.json"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "openclaw",
+    "plugin",
+    "mcsmanager"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.41",
+    "openclaw": "^2026.3.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "openclaw": {
+    "emoji": "🎮",
+    "requires": {
+      "env": [
+        "MCSMANAGER_BASE_URL",
+        "MCSMANAGER_API_KEY"
+      ]
+    },
+    "primaryEnv": "MCSMANAGER_API_KEY",
+    "extensions": [
+      "./dist/index.js"
+    ]
+  }
+}

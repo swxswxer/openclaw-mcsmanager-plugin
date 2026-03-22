@@ -1,0 +1,33 @@
+{
+  "id": "openclaw-mcsmanager-plugin",
+  "uiHints": {
+    "baseUrl": {
+      "label": "面板地址",
+      "help": "例如 http://127.0.0.1:23333"
+    },
+    "apiKey": {
+      "label": "API Key",
+      "sensitive": true
+    },
+    "timeoutMs": {
+      "label": "超时时间（毫秒）",
+      "advanced": true
+    }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "baseUrl": {
+        "type": "string"
+      },
+      "apiKey": {
+        "type": "string"
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 1000
+      }
+    }
+  }
+}
