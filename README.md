@@ -2,11 +2,8 @@
 
 # openclaw-mcsmanager-plugin
 
-> 面向 OpenClaw 的 MCSManager 插件
-
-让 Agent 以更自然的方式接入 MCSManager，  
-完成实例查询、状态查看、启停重启、控制台命令下发等常用操作。  
-当前版本聚焦仪表盘管理与实例管理，并为后续扩展节点、文件、镜像等模块预留了清晰结构。
+OpenClaw的MCSManager插件，
+用于在对话中优雅的管理Minecraft服务器或其他由MCSManager托管的实例
 
 ---
 
